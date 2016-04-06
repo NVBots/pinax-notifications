@@ -26,17 +26,29 @@ class EmailBackend(BaseBackend):
         })
         context.update(extra_context)
 
+        message_type = "txt" if not settings.PINAX_NOTIFICATIONS_USE_HTML_EMAIL else "html"
+
+        email_body_template = "pinax/notifications/email_body.{0}".format(message_type)
+        full_template = "full.{0}".format(message_type)
+
+        print email_body_template, full_template
+
         messages = self.get_formatted_messages((
             "short.txt",
-            "full.txt"
+            full_template
         ), notice_type.label, context)
 
         subject = "".join(render_to_string("pinax/notifications/email_subject.txt", {
             "message": messages["short.txt"],
         }, context).splitlines())
 
-        body = render_to_string("pinax/notifications/email_body.txt", {
-            "message": messages["full.txt"],
+        body = render_to_string(email_body_template, {
+            "message": messages[full_template],
         }, context)
 
-        send_mail(subject, body, settings.DEFAULT_FROM_EMAIL, [recipient.email])
+        print body
+
+        if settings.PINAX_NOTIFICATIONS_USE_HTML_EMAIL:
+            send_mail(subject, "", settings.DEFAULT_FROM_EMAIL, [recipient.email], html_message=body)
+        else:
+            send_mail(subject, body, settings.DEFAULT_FROM_EMAIL, [recipient.email])

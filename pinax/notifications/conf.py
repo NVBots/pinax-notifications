@@ -49,6 +49,7 @@ class PinaxNotificationsAppConf(AppConf):
     GET_LANGUAGE_MODEL = None
     LANGUAGE_MODEL = None
     QUEUE_ALL = False
+    USE_HTML_EMAIL = False
     BACKENDS = [
         ("email", "pinax.notifications.backends.email.EmailBackend"),
     ]
