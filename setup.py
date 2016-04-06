@@ -21,15 +21,14 @@ setup(
     license="MIT",
     packages=find_packages(),
     package_data={
-        "pinax.notifications": [
-            "locale/**/**/*",
-            "templates/pinax/notifications/*"
-        ]
+        "notifications": []
     },
     install_requires=[
         "django-appconf>=1.0.1"
     ],
     test_suite="runtests.runtests",
+    tests_require=[
+    ],
     classifiers=[
         "Development Status :: 5 - Production/Stable",
         "Environment :: Web Environment",

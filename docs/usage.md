@@ -90,7 +90,7 @@ There are two templates that ship with `pinax-notifications` in support of the
 single email backend that is included out of the box:
 
 * ``short.txt`` renders to the email subject
-* ``full.txt`` renders to teh email body
+* ``full.txt`` renders to the email body
 
 In addition to the extra context that is supplied via the `send` call in your
 site or app, these templates are rendered with the following context variables:

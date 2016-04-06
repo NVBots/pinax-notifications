@@ -11,3 +11,5 @@ test:
 
 docs:
 	mkdocs build
+
+.PHONY: docs
