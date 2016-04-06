@@ -31,8 +31,6 @@ class EmailBackend(BaseBackend):
         email_body_template = "pinax/notifications/email_body.{0}".format(message_type)
         full_template = "full.{0}".format(message_type)
 
-        print email_body_template, full_template
-
         messages = self.get_formatted_messages((
             "short.txt",
             full_template
@@ -45,8 +43,6 @@ class EmailBackend(BaseBackend):
         body = render_to_string(email_body_template, {
             "message": messages[full_template],
         }, context)
-
-        print body
 
         if settings.PINAX_NOTIFICATIONS_USE_HTML_EMAIL:
             send_mail(subject, "", settings.DEFAULT_FROM_EMAIL, [recipient.email], html_message=body)
