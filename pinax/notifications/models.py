@@ -97,7 +97,7 @@ class NoticeSetting(models.Model):
     class Meta:
         verbose_name = _("notice setting")
         verbose_name_plural = _("notice settings")
-        unique_together = ("user", "notice_type", "medium", "scoping_content_type", "scoping_object_id")
+        unique_together = ("user", "notice_type", "medium")
 
 
 class NoticeQueueBatch(models.Model):
