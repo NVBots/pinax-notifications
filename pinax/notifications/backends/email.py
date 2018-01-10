@@ -8,6 +8,7 @@ from .base import BaseBackend
 
 class EmailBackend(BaseBackend):
     spam_sensitivity = 2
+    BULK_DELIVERY = True
 
     def can_send(self, user, notice_type, scoping):
         can_send = super(EmailBackend, self).can_send(user, notice_type, scoping)
@@ -15,7 +16,7 @@ class EmailBackend(BaseBackend):
             return True
         return False
 
-    def deliver(self, recipient, sender, notice_type, extra_context):
+    def get_datatuple(self, recipient, sender, notice_type, extra_context):
         # TODO: require this to be passed in extra_context
 
         context = self.default_context()
@@ -44,7 +45,13 @@ class EmailBackend(BaseBackend):
         context.update({"message": messages[full_template]})
         body = render_to_string(email_body_template, context)
 
+        return subject, body, settings.DEFAULT_FROM_EMAIL, [recipient.email]
+
+
+    def deliver(self, recipient, sender, notice_type, extra_context):
+        subject, body, from_email, recipient_list = self.get_datatuple(recipient, sender, notice_type, extra_context)
+
         if settings.PINAX_NOTIFICATIONS_USE_HTML_EMAIL:
-            send_mail(subject, "", settings.DEFAULT_FROM_EMAIL, [recipient.email], html_message=body)
+            send_mail(subject, "", from_email, recipient_list, html_message=body)
         else:
-            send_mail(subject, body, settings.DEFAULT_FROM_EMAIL, [recipient.email])
+            send_mail(subject, body, from_email, recipient_list)
