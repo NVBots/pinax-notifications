@@ -1,9 +1,19 @@
 from django.conf import settings
-from django.core.mail import send_mail, send_mass_mail
+from django.core.mail import send_mail, send_mass_mail, get_connection, EmailMultiAlternatives
 from django.template.loader import render_to_string
 from django.utils.translation import ugettext
 
 from .base import BaseBackend
+
+
+def send_mass_html_mail(datatuple, fail_silently=False, user=None, password=None, connection=None):
+    connection = connection or get_connection(username=user, password=password, fail_silently=fail_silently)
+    messages = []
+    for subject, html, from_email, recipient in datatuple:
+        message = EmailMultiAlternatives(subject, '', from_email, recipient)
+        message.attach_alternative(html, 'text/html')
+        messages.append(message)
+    return connection.send_messages(messages)
 
 
 class EmailBackend(BaseBackend):
@@ -57,4 +67,4 @@ class EmailBackend(BaseBackend):
             send_mail(subject, body, from_email, recipient_list)
 
     def bulk_deliver(self, messages):
-        send_mass_mail(tuple(messages))
+        send_mass_html_mail(tuple(messages))
