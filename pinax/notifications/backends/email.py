@@ -1,5 +1,5 @@
 from django.conf import settings
-from django.core.mail import send_mail
+from django.core.mail import send_mail, send_mass_mail
 from django.template.loader import render_to_string
 from django.utils.translation import ugettext
 
@@ -55,3 +55,6 @@ class EmailBackend(BaseBackend):
             send_mail(subject, "", from_email, recipient_list, html_message=body)
         else:
             send_mail(subject, body, from_email, recipient_list)
+
+    def bulk_deliver(self, messages):
+        send_mass_mail(tuple(messages))

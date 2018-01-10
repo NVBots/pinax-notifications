@@ -144,6 +144,9 @@ def send_now(users, label, extra_context=None, sender=None, scoping=None):
 
     current_language = get_language()
 
+    # dictionary of backends with list of messages to send in bulk
+    bulk_messages = {}
+
     for user in users:
         # get user language for user from language store defined in
         # NOTIFICATION_LANGUAGE_MODULE setting
@@ -158,8 +161,16 @@ def send_now(users, label, extra_context=None, sender=None, scoping=None):
 
         for backend in settings.PINAX_NOTIFICATIONS_BACKENDS.values():
             if backend.can_send(user, notice_type, scoping=scoping):
-                backend.deliver(user, sender, notice_type, extra_context)
+                if getattr(backend, 'BULK_DELIVERY', False):
+                    bulk_messages.setdefault(backend, [])
+                    datatuple = backend.get_datatuple(user, sender, notice_type, extra_context)
+                    bulk_messages[backend].append(datatuple)
+                else:
+                    backend.deliver(user, sender, notice_type, extra_context)
                 sent = True
+
+    for backend, messages in bulk_messages.items():
+        backend.bulk_deliver(messages)
 
     # reset environment to original language
     activate(current_language)
